@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Requirements page for Pipedrive
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function pipedrive_requirements($phase) {
+  $requirements = array();
+
+  // Report the version
+  if ($phase == 'runtime') {
+    // Make sure Libraries is loaded before loading.
+    drupal_load('module', 'libraries');
+    $pipedrive = libraries_detect('pipedrive');
+    $requirements['pipedrive'] = array(
+      'title' => $pipedrive['name'],
+      'severity' => $pipedrive['installed'] ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+      'value' => $pipedrive['installed'] ? $pipedrive['version'] : $pipedrive['error message'],
+    );
+  }
+
+  return $requirements;
+}

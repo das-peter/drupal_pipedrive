@@ -1,1 +1,6 @@
 name = Pipedrive
+description = Integration with Pipedrive.com service.
+core = 7.x
+
+dependencies[] = libraries
+configure = admin/config/system/pipedrive
