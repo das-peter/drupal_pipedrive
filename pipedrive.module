@@ -6,34 +6,34 @@ require_once('pipedrive.api.inc');
  */
 function pipedrive_libraries_info()
 {
-    $libraries['pipedrive'] = array(
-        'name' => 'Pipedrive',
-        'vendor url' => 'https://github.com/TTRGroup/pipedrive-api-php',
-        'download url' => 'https://github.com/TTRGroup/pipedrive-api-php/archive/master.zip',
-        'version arguments' => array(
-            'file' => 'composer.json',
-            'pattern' => '/((?:\d+\.?){2,3})/',
-        ),
-        'files' => array(
-            'php' => array(
-                'src/Benhawker/Pipedrive/Exceptions/PipedriveException.php',
-                'src/Benhawker/Pipedrive/Exceptions/PipedriveApiError.php',
-                'src/Benhawker/Pipedrive/Exceptions/PipedriveHttpError.php',
-                'src/Benhawker/Pipedrive/Exceptions/PipedriveMissingFieldError.php',
-                'src/Benhawker/Pipedrive/Library/Activities.php',
-                'src/Benhawker/Pipedrive/Library/Curl.php',
-                'src/Benhawker/Pipedrive/Library/DealFields.php',
-                'src/Benhawker/Pipedrive/Library/Deals.php',
-                'src/Benhawker/Pipedrive/Library/Notes.php',
-                'src/Benhawker/Pipedrive/Library/Organizations.php',
-                'src/Benhawker/Pipedrive/Library/Persons.php',
-                'src/Benhawker/Pipedrive/Library/Products.php',
-                'src/Benhawker/Pipedrive/Pipedrive.php',
-            ),
-        ),
-    );
+  $libraries['pipedrive'] = array(
+    'name' => 'Pipedrive',
+    'vendor url' => 'https://github.com/TTRGroup/pipedrive-api-php',
+    'download url' => 'https://github.com/TTRGroup/pipedrive-api-php/archive/master.zip',
+    'version arguments' => array(
+      'file' => 'composer.json',
+      'pattern' => '/((?:\d+\.?){2,3})/',
+    ),
+    'files' => array(
+      'php' => array(
+        'src/Benhawker/Pipedrive/Exceptions/PipedriveException.php',
+        'src/Benhawker/Pipedrive/Exceptions/PipedriveApiError.php',
+        'src/Benhawker/Pipedrive/Exceptions/PipedriveHttpError.php',
+        'src/Benhawker/Pipedrive/Exceptions/PipedriveMissingFieldError.php',
+        'src/Benhawker/Pipedrive/Library/Activities.php',
+        'src/Benhawker/Pipedrive/Library/Curl.php',
+        'src/Benhawker/Pipedrive/Library/DealFields.php',
+        'src/Benhawker/Pipedrive/Library/Deals.php',
+        'src/Benhawker/Pipedrive/Library/Notes.php',
+        'src/Benhawker/Pipedrive/Library/Organizations.php',
+        'src/Benhawker/Pipedrive/Library/Persons.php',
+        'src/Benhawker/Pipedrive/Library/Products.php',
+        'src/Benhawker/Pipedrive/Pipedrive.php',
+      ),
+    ),
+  );
 
-    return $libraries;
+  return $libraries;
 }
 
 /**
@@ -43,21 +43,21 @@ function pipedrive_libraries_info()
 function pipedrive_menu()
 {
 
-    $items = array();
+  $items = array();
 
-    $items['admin/config/services/pipedrive'] = array(
-        'title' => 'Pipedrive',
-        'description' => 'Configure your Pipedrive account details',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('pipedrive_account_settings_form'),
-        'access arguments' => array('administer pipedrive'),
-        'file' => 'pipedrive.admin.inc',
-        'file path' => drupal_get_path('module', 'pipedrive'),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 30,
-    );
+  $items['admin/config/services/pipedrive'] = array(
+    'title' => 'Pipedrive',
+    'description' => 'Configure your Pipedrive account details',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pipedrive_account_settings_form'),
+    'access arguments' => array('administer pipedrive'),
+    'file' => 'pipedrive.admin.inc',
+    'file path' => drupal_get_path('module', 'pipedrive'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 30,
+  );
 
-    return $items;
+  return $items;
 }
 
 
@@ -67,11 +67,11 @@ function pipedrive_menu()
  */
 function pipedrive_permission()
 {
-    return array(
-        'administer pipedrive' => array(
-            'title' => t('Administer Pipedrive module'),
-            'description' => t('Administer access to everything in module'),
-            'restrict access' => TRUE,
-        ),
-    );
+  return array(
+    'administer pipedrive' => array(
+      'title' => t('Administer Pipedrive module'),
+      'description' => t('Administer access to everything in module'),
+      'restrict access' => TRUE,
+    ),
+  );
 }

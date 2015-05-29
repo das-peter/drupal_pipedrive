@@ -1,10 +1,11 @@
 <?php
-/*/ 
- * Implementation of hook_form
+/**
+ * Implements of hook_form().
  *
  */
-function pipedrive_account_settings_form($form_state) {
-  
+function pipedrive_account_settings_form($form_state)
+{
+
   $form = array();
 
   $form['pipedrive_api_token'] = array(
@@ -21,10 +22,11 @@ function pipedrive_account_settings_form($form_state) {
 }
 
 /**
- * Implementation of hook_form_submit() for pipedrive_account_settings_form
+ * Implements of hook_form_submit() for pipedrive_account_settings_form
  *
  */
-function pipedrive_account_settings_form_submit($form, &$form_state) {
+function pipedrive_account_settings_form_submit($form, &$form_state)
+{
 
   // Write the variable table
   variable_set('pipedrive_api_token', $form_state['values']['pipedrive_api_token']);
@@ -36,4 +38,3 @@ function pipedrive_account_settings_form_submit($form, &$form_state) {
   // Redirect back
   $form_state['redirect'] = 'admin/config/services/pipedrive';
 }
-?>
