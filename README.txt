@@ -24,12 +24,16 @@ how to install or update Drupal modules.
 
 The Libraries module is required.
 
-1. Download the Pipedrive PHP library (https://github.com/TTRGroup/pipedrive-api-php/archive/master.zip)
+1. Download the Pipedrive PHP library
+   https://github.com/TTRGroup/pipedrive-api-php/archive/master.zip
 2. Unzip under sites/all/libraries/pipedrive so that Pipedrive.php is 
-   located at sites/all/libraries/pipedrive/src/Benhawker/Pipedrive/Pipedrive.php
+   located at sites/all/libraries/pipedrive/src/Benhawker/Pipedrive/
+   Pipedrive.php
 3. Enable the module
-4. Configure the module at admin/config/services/pipedrive. The API Key can be found 
-   under your Pipedrive account at https://[subdomain].pipedrive.com/settings#api.
+4. Configure the module at admin/config/services/pipedrive.
+   The API Key can be found
+   under your Pipedrive account at:
+   https://[subdomain].pipedrive.com/settings#api.
 
 
 USAGE

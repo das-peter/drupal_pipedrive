@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Requirements page for Pipedrive
+ * Requirements page for Pipedrive.
  */
 
 /**
@@ -11,7 +11,6 @@
 function pipedrive_requirements($phase) {
   $requirements = array();
 
-  // Report the version
   if ($phase == 'runtime') {
     // Make sure Libraries is loaded before loading.
     drupal_load('module', 'libraries');

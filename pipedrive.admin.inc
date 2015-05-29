@@ -1,10 +1,13 @@
 <?php
 /**
- * Implements of hook_form().
- *
+ * @file
+ * Pipedrive Admin Page.
  */
-function pipedrive_account_settings_form($form_state)
-{
+
+/**
+ * Implements hook_form().
+ */
+function pipedrive_account_settings_form($form_state) {
 
   $form = array();
 
@@ -22,19 +25,13 @@ function pipedrive_account_settings_form($form_state)
 }
 
 /**
- * Implements of hook_form_submit() for pipedrive_account_settings_form
- *
+ * Implements hook_form_submit() for pipedrive_account_settings_form().
  */
-function pipedrive_account_settings_form_submit($form, &$form_state)
-{
+function pipedrive_account_settings_form_submit($form, &$form_state) {
 
-  // Write the variable table
   variable_set('pipedrive_api_token', $form_state['values']['pipedrive_api_token']);
 
-
-  // Inform the administrator that the default project / experiement entry is ready to be enabled.
   drupal_set_message(t('Your API Token has been saved'), 'status');
 
-  // Redirect back
   $form_state['redirect'] = 'admin/config/services/pipedrive';
 }

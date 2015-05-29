@@ -1,11 +1,15 @@
 <?php
-require_once('pipedrive.api.inc');
+/**
+ * @file
+ * Pipedrive Module File.
+ */
+
+require_once 'pipedrive.api.inc';
 
 /**
  * Implements hook_libraries_info().
  */
-function pipedrive_libraries_info()
-{
+function pipedrive_libraries_info() {
   $libraries['pipedrive'] = array(
     'name' => 'Pipedrive',
     'vendor url' => 'https://github.com/TTRGroup/pipedrive-api-php',
@@ -38,10 +42,8 @@ function pipedrive_libraries_info()
 
 /**
  * Implements hook_menu().
- *
  */
-function pipedrive_menu()
-{
+function pipedrive_menu() {
 
   $items = array();
 
@@ -63,10 +65,8 @@ function pipedrive_menu()
 
 /**
  * Implements hook_permission().
- *
  */
-function pipedrive_permission()
-{
+function pipedrive_permission() {
   return array(
     'administer pipedrive' => array(
       'title' => t('Administer Pipedrive module'),
