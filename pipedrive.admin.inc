@@ -24,14 +24,3 @@ function pipedrive_account_settings_form($form_state) {
   return system_settings_form($form);
 }
 
-/**
- * Implements hook_form_submit() for pipedrive_account_settings_form().
- */
-function pipedrive_account_settings_form_submit($form, &$form_state) {
-
-  variable_set('pipedrive_api_token', $form_state['values']['pipedrive_api_token']);
-
-  drupal_set_message(t('Your API Token has been saved'), 'status');
-
-  $form_state['redirect'] = 'admin/config/services/pipedrive';
-}

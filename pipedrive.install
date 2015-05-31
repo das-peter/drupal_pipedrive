@@ -24,3 +24,10 @@ function pipedrive_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function pipedrive_uninstall() {
+  variable_del('pipedrive_api_token');
+}
