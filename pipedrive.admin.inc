@@ -23,4 +23,3 @@ function pipedrive_account_settings_form($form_state) {
 
   return system_settings_form($form);
 }
-
