@@ -30,4 +30,40 @@ function pipedrive_requirements($phase) {
  */
 function pipedrive_uninstall() {
   variable_del('pipedrive_api_token');
+  variable_del('pipedrive_rules_data_info');
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function pipedrive_field_schema($field) {
+  return array(
+    'columns' => array(
+      'id' => array(
+        'description' => 'The pipedrive id',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'last_sync' => array(
+        'description' => 'Time of the last successful sync of the field',
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+      'status' => array(
+        'description' => 'Sync status of the field',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => FALSE,
+      ),
+      'data' => array(
+        'description' => 'Additional data for this pipedrive field.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+      ),
+    ),
+  );
 }

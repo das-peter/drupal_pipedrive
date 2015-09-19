@@ -75,3 +75,322 @@ function pipedrive_permission() {
     ),
   );
 }
+
+/**
+ * Return a list of available data type machine names.
+ *
+ * @return array
+ *   List of pipedrive data type  machine names.
+ *   Key is singular, value is plural.
+ */
+function pipedrive_data_types() {
+  // Notes and products are not yet supported by the library.
+  return array(
+    'activity' => 'activities',
+    'deal' => 'deals',
+    'organization' => 'organizations',
+    'person' => 'persons',
+  );
+}
+
+/**
+ * Return a list of available data types.
+ *
+ * @return array
+ *   List of pipedrive data types.
+ */
+function pipedrive_data_type_options() {
+  // Notes and products are not yet supported by the library.
+  return array(
+    'activities' => t('Activities', array(), array('context' => 'pipedrive')),
+    'deals' => t('Deals', array(), array('context' => 'pipedrive')),
+    // 'notes' => t('notes', array(), array('context' => 'pipedrive')),
+    'organizations' => t('Organizations', array(), array('context' => 'pipedrive')),
+    'persons' => t('Persons', array(), array('context' => 'pipedrive')),
+    // 'products' => t('Products', array(), array('context' => 'pipedrive')),
+  );
+}
+
+/**
+ * Return an option list of available activity types.
+ *
+ * @return array
+ *   List of pipedrive activity types.
+ *
+ * @TODO Extend the library to support /ActivityTypes.
+ */
+function pipedrive_activity_type_options() {
+  return array(
+    'call' => t('Call', array(), array('context' => 'pipedrive')),
+    'meeting' => t('Meeting', array(), array('context' => 'pipedrive')),
+    'task' => t('Task', array(), array('context' => 'pipedrive')),
+    'deadline' => t('Deadline', array(), array('context' => 'pipedrive')),
+    'email' => t('E-Mail', array(), array('context' => 'pipedrive')),
+    'lunch' => t('Lunch', array(), array('context' => 'pipedrive')),
+  );
+}
+
+/**
+ * Return an option list of visibility types.
+ *
+ * @return array
+ *   List of pipedrive visibility types.
+ */
+function pipedrive_visibility_options() {
+  return array(
+    '1' => t('Owner & followers (private)', array(), array('context' => 'pipedrive')),
+    '3' => t('Entire company (shared)', array(), array('context' => 'pipedrive')),
+  );
+}
+
+/**
+ * Return an option list of available deal status.
+ *
+ * @return array
+ *   List of pipedrive deal status types.
+ */
+function pipedrive_deal_status_options() {
+  return array(
+    'open' => t('Open', array(), array('context' => 'pipedrive')),
+    'won' => t('Won', array(), array('context' => 'pipedrive')),
+    'lost' => t('Lost', array(), array('context' => 'pipedrive')),
+    'deleted' => t('Deleted', array(), array('context' => 'pipedrive')),
+  );
+}
+
+/**
+ * Implements hook_field_info().
+ */
+function pipedrive_field_info() {
+  return array(
+    'pipedrive' => array(
+      'label' => 'Pipedrive',
+      'description' => t('This field allows you to sync the entity it is attached to with pipedrive.'),
+      'default_widget' => 'pipedrive_widget',
+      'default_formatter' => 'pipedrive_default',
+      'settings' => array(
+        'pipedrive_type' => 'activity',
+      ),
+      'instance_settings' => array(
+        'sync_delete' => TRUE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function pipedrive_field_settings_form($field, $instance, $has_data) {
+  $element['pipedrive_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Pipedrive data type'),
+    '#default_value' => $field['settings']['pipedrive_type'],
+    '#options' => pipedrive_data_type_options(),
+    '#disabled' => $has_data,
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Enforce field cardinality of 1.
+ */
+function pipedrive_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+  if ($form['#field']['type'] == 'pipedrive') {
+    $form['field']['cardinality']['#options'] = array(1 => 1);
+  }
+}
+
+/**
+ * Implements hook_field_instance_settings_form().
+ */
+function pipedrive_field_instance_settings_form($field, $instance) {
+  $settings = $instance['settings'];
+  $form['sync_delete'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Delete pipedrive data when the entity is deleted.'),
+    '#default_value' => !empty($settings['sync_delete']),
+  );
+  return $form;
+}
+
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function pipedrive_field_is_empty($item, $field) {
+  return empty($item['id']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function pipedrive_field_formatter_info() {
+  $formats = array(
+    'pipedrive_default' => array(
+      'label' => t('Pipedrive ID'),
+      'description' => t('Display the pipedrive id.'),
+      'field types' => array('pipedrive'),
+    ),
+    'pipedrive_summary' => array(
+      'label' => t('Pipedrive summary'),
+      'description' => t('Display a summary of the pipedrive sync state.'),
+      'field types' => array('pipedrive'),
+    ),
+  );
+  return $formats;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function pipedrive_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  switch ($display['type']) {
+    case 'pipedrive_default':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array('#markup' => $item['id']);
+      }
+      break;
+
+    case 'pipedrive_summary':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['id'] = array(
+          '#type' => 'item',
+          '#title' => t('Pipedrive ID'),
+          '#markup' => $item['id'],
+        );
+        $element[$delta]['last_sync'] = array(
+          '#type' => 'item',
+          '#title' => t('Last Sync'),
+          '#markup' => $item['last_sync'],
+        );
+        $element[$delta]['status'] = array(
+          '#type' => 'item',
+          '#title' => t('Status'),
+          '#markup' => $item['status'],
+        );
+      }
+      break;
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function pipedrive_field_widget_info() {
+  return array(
+    'pipedrive_widget' => array(
+      'label' => t('Pipedrive field'),
+      'field types' => array('pipedrive'),
+      'settings' => array('size' => 60),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function pipedrive_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+  $form = array();
+  return $form;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function pipedrive_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
+  $element = $base;
+  // @ToDo Add a field to manually trigger a sync?
+  return $element;
+}
+
+/**
+ * Implements hook_field_insert().
+ */
+function pipedrive_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  $context = array(
+    'entity_type' => $entity_type,
+    'entity' => $entity,
+    'field' => $field,
+    'instance' => $instance,
+    'langcode' => $langcode,
+  );
+  drupal_alter('pipedrive_field_insert', $items, $context);
+  if (module_exists('rules')) {
+    rules_invoke_all('pipedrive_field_sync');
+  }
+  else {
+    module_invoke_all('pipedrive_field_sync');
+  }
+}
+
+/**
+ * Implements hook_field_update().
+ */
+function pipedrive_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  $data_types = array_flip(pipedrive_data_types());
+  if (isset($data_types[$field['settings']['pipedrive_type']])) {
+    $pipedrive_type = $data_types[$field['settings']['pipedrive_type']];
+    $context = array(
+      'entity_type' => $entity_type,
+      'entity' => $entity,
+      'field' => $field,
+      'instance' => $instance,
+      'langcode' => $langcode,
+    );
+    $sync_data = new stdClass();
+    // Check if there's an id - if so add it to the sync data. Our field type
+    // has and enforced cardinality of 1, no need for a loop.
+    if (!empty($items[0]['id'])) {
+      $sync_data->id = $items[0]['id'];
+    }
+    // If rules is available fire the related event. This provides a
+    // configurable syncing mode.
+    if (module_exists('rules')) {
+      $wrapped_entity = entity_metadata_wrapper($entity_type, $entity);
+      rules_invoke_event('pipedrive_field_sync_' . $pipedrive_type, $sync_data, $wrapped_entity);
+    }
+    // Let other modules act on this event too.
+    module_invoke_all('pipedrive_field_sync', $pipedrive_type, $sync_data, $entity_type, $entity, $context);
+
+    // If sync isn't skipped do it now.
+    if (empty($sync_data->skip_sync) && !empty($sync_data)) {
+      // Clean some data.
+      unset($sync_data->skip_sync);
+
+      // Load library and use it to save the sync date.
+      $pipedrive = pipedrive_load_library();
+      if (!empty($sync_data->id)) {
+        $synced = $pipedrive->{$field['settings']['pipedrive_type']}()->update($sync_data->id, (array) $sync_data);
+      }
+      else {
+        $synced = $pipedrive->{$field['settings']['pipedrive_type']}()->add((array) $sync_data);
+      }
+
+      // Process the response and set the field values accordingly.
+      $items[0]['status'] = (int) !empty($synced['success']);
+      $items[0]['last_sync'] = time();
+      // If this is a new item and the save was a success store the remote id.
+      if (!empty($synced['success']) && empty($items[0]['id'])) {
+        $items[0]['id'] = $synced['data']['id'];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_delete().
+ */
+function pipedrive_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // If deletion sync is enabled and there's a remote id - delete.
+  if (!empty($instance['settings']['sync_delete']) && !empty($items[0]['id'])) {
+    $pipedrive = pipedrive_load_library();
+    $pipedrive->{$field['settings']['pipedrive_type']}()->delete($items[0]['id']);
+  }
+}
