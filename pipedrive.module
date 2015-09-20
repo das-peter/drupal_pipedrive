@@ -427,3 +427,75 @@ function pipedrive_field_delete($entity_type, $entity, $field, $instance, $langc
     $pipedrive->{$field['settings']['pipedrive_type']}()->delete($items[0]['id']);
   }
 }
+
+/**
+ * Returns the dynamic fields of a pipedrive data type.
+ *
+ * The values are cached to reduce the requests to pipedrive and enhance
+ * performance.
+ *
+ * @param string $type
+ *   Pipedrive data type (singular). E.g. deal.
+ *
+ * @return array
+ *   Field definition as defined by the pipdrive API.
+ */
+function pipedrive_get_dynamic_fields($type, $reset = FALSE) {
+  $cache = cache_get('pipdrive:dynamic_fields');
+  $type = strtolower($type);
+  $fields = array();
+  if (!empty($cache->data)) {
+    $fields = $cache->data;
+  }
+  if (empty($fields[$type]) || $reset) {
+    $pipedrive = pipedrive_load_library();
+    $fields[$type] = array();
+    $method = $type . 'Fields';
+    if (method_exists($pipedrive, $method)) {
+      $response = $pipedrive->$method()->getAll();
+      if (!empty($response['success'])) {
+        $fields[$type] = $response['data'];
+        cache_set('pipdrive:dynamic_fields', $fields);
+      }
+    }
+  }
+  return $fields[$type];
+}
+
+/**
+ * Map of pipedrive data types to Drupal property types.
+ *
+ * @param string $pipedrive_type
+ *   The pipedrive data type to resolve.
+ *
+ * @return string|array
+ *   The property type of a pipedrive type is given or the whole map.
+ */
+function pipedrive_datatype_map($pipedrive_type = NULL) {
+  $map = array(
+    'varchar' => 'text',
+    'double' => 'decimal',
+    'int' => 'integer',
+    'date' => 'date',
+    'enum' => 'list',
+    'visible_to' => 'integer',
+    'monetary' => 'text',
+    'picture' => 'text',
+    'status' => 'text',
+    'phone' => 'text',
+    'varchar_auto' => 'text',
+    'user' => 'text',
+    'stage' => 'text',
+    'people' => 'text',
+    'address' => 'text',
+    'org' => 'text',
+  );
+  if ($pipedrive_type) {
+    if (isset($map[$pipedrive_type])) {
+      return $map[$pipedrive_type];
+    }
+    // @TODO should we simply return text?
+    return NULL;
+  }
+  return $map;
+}

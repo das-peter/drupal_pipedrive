@@ -155,6 +155,7 @@ function pipedrive_rules_data_info() {
       ),
     ),
   );
+  pipedrive_rules_data_info_dynamic_fields('deal', $data_info['pipedrive_deal']);
 
   // @TODO Add support for OrganizationFields.
   $data_info['pipedrive_organization'] = array(
@@ -186,6 +187,7 @@ function pipedrive_rules_data_info() {
       ),
     ),
   );
+  pipedrive_rules_data_info_dynamic_fields('organization', $data_info['pipedrive_organization']);
 
   // @TODO Add support for PersonsFields.
   $data_info['pipedrive_person'] = array(
@@ -233,6 +235,7 @@ function pipedrive_rules_data_info() {
       ),
     ),
   );
+  pipedrive_rules_data_info_dynamic_fields('person', $data_info['pipedrive_person']);
 
   // Set the property getter / setter.
   foreach ($data_info as $type => &$info) {
@@ -248,4 +251,38 @@ function pipedrive_rules_data_info() {
   }
 
   return $data_info;
+}
+
+function pipedrive_rules_data_info_dynamic_fields($type, &$info) {
+  $type_map = pipedrive_datatype_map();
+  // Fetch dynamic fields.
+  $fields = pipedrive_get_dynamic_fields($type);
+  foreach ($fields as $field) {
+    // Only add if a related property type was found and property wasn't defined
+    // manually.
+    if (isset($type_map[$field['field_type']]) && !isset($info['property info'][$field['key']])) {
+      $info['property info'][$field['key']] = array(
+        'type' => $type_map[$field['field_type']],
+        'label' => $field['name'],
+      );
+      // Add required flag.
+      if (!empty($field['mandatory_flag'])) {
+        $info['property info'][$field['key']]['required'] = TRUE;
+      }
+      // Handle options lists.
+      if (!empty($field['options'])) {
+        $info['property info'][$field['key']]['options list'] = 'pipedrive_rules_data_info_dynamic_fields_options';
+        foreach ($field['options'] as $option) {
+          $info['property info'][$field['key']]['options data'][$option['id']] = $option['label'];
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Dynamic options list callback for rules data types.
+ */
+function pipedrive_rules_data_info_dynamic_fields_options($name, $info, $op) {
+  return $info['options data'];
 }
