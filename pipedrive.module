@@ -8,8 +8,13 @@ require_once 'pipedrive.api.inc';
 
 /**
  * Implements hook_libraries_info().
+ *
+ * @see pipedrive_libraries_info_pipedrive_predetect()
  */
 function pipedrive_libraries_info() {
+  // The php files here are the ones required in a specific loading order, all
+  // others are automatically detected by
+  // pipedrive_libraries_info_pipedrive_predetect().
   $libraries['pipedrive'] = array(
     'name' => 'Pipedrive',
     'vendor url' => 'https://github.com/TTRGroup/pipedrive-api-php',
@@ -35,9 +40,37 @@ function pipedrive_libraries_info() {
         'src/Benhawker/Pipedrive/Pipedrive.php',
       ),
     ),
+    'callbacks' => array(
+      'pre-detect' => array(
+        'pipedrive_libraries_info_pipedrive_predetect',
+      ),
+    ),
   );
 
   return $libraries;
+}
+
+/**
+ * Dynamically add library files.
+ *
+ * Ideally this would be handled by a PSR-4 autoloader.
+ * This adds automatically newly added files. However you've to declare some of
+ * the files in pipedrive_libraries_info() to maintain the required order of
+ * loading.
+ *
+ * @param array $library
+ *   The library info.
+ */
+function pipedrive_libraries_info_pipedrive_predetect(&$library) {
+  $library_path = DRUPAL_ROOT . '/' . $library['library path'];
+  $itr = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($library_path));
+  /** @var SplFileInfo $item */
+  foreach ($itr as $item) {
+    if ($item->isFile() && $item->getExtension() == 'php') {
+      $file = str_replace('\\', '/', str_replace($library_path . DIRECTORY_SEPARATOR, '', $item->getPathname()));
+      $library['files']['php'][$file] = array();
+    }
+  }
 }
 
 /**
