@@ -286,3 +286,49 @@ function pipedrive_rules_data_info_dynamic_fields($type, &$info) {
 function pipedrive_rules_data_info_dynamic_fields_options($name, $info, $op) {
   return $info['options data'];
 }
+
+/**
+ * Implements hook_rules_action_info().
+ */
+function pipedrive_rules_action_info() {
+  return array(
+    'pipedrive_fetch' => array(
+      'label' => t('Fetch data from pipedrive'),
+      'parameter' => array(
+        'type' => array(
+          'type' => 'text',
+          'label' => t('Pipedrive data type'),
+          'options list' => 'pipedrive_data_type_options',
+          'description' => t('Specifies the type of pipedrive data that should be fetched.'),
+          'restriction' => 'input',
+        ),
+        'id' => array('type' => 'text', 'label' => t('Identifier')),
+      ),
+      'group' => t('Pipedrive'),
+      'base' => 'pipedrive_rules_action_pipedriv_fetch',
+      'provides' => array(
+        'pipedrive_fetched' => array('type' => 'unknown', 'label' => t('Fetched pipedrive data')),
+      ),
+    ),
+  );
+}
+
+/**
+ * Info alteration callback for the entity fetch action.
+ */
+function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
+  $element_info['provides']['pipedrive_fetched']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
+}
+
+/**
+ * Fetches data from pipedrive.
+ */
+function pipedrive_rules_action_pipedriv_fetch($type, $id) {
+  // Load library and use it to save the sync date.
+  $pipedrive = pipedrive_load_library();
+  $data = $pipedrive->{$type}()->getById($id);
+  if (!empty($data['success'])) {
+    return array('pipedrive_fetched' => (object) $data['data']);
+  }
+  return array('pipedrive_fetched' => NULL);
+}
