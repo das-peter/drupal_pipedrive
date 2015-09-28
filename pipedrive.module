@@ -397,7 +397,7 @@ function pipedrive_field_update($entity_type, $entity, $field, $instance, $langc
       // Clean some data.
       unset($sync_data->skip_sync);
 
-      // Load library and use it to save the sync date.
+      // Load library and use it to save the sync data.
       $pipedrive = pipedrive_load_library();
       if (!empty($sync_data->id)) {
         $synced = $pipedrive->{$field['settings']['pipedrive_type']}()->update($sync_data->id, (array) $sync_data);

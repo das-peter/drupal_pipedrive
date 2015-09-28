@@ -324,7 +324,7 @@ function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesA
  * Fetches data from pipedrive.
  */
 function pipedrive_rules_action_pipedriv_fetch($type, $id) {
-  // Load library and use it to save the sync date.
+  // Load library and use it to fetch the data.
   $pipedrive = pipedrive_load_library();
   $data = $pipedrive->{$type}()->getById($id);
   if (!empty($data['success'])) {
