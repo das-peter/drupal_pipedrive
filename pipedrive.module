@@ -347,20 +347,8 @@ function pipedrive_field_widget_form(&$form, &$form_state, $field, $instance, $l
  * Implements hook_field_insert().
  */
 function pipedrive_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  $context = array(
-    'entity_type' => $entity_type,
-    'entity' => $entity,
-    'field' => $field,
-    'instance' => $instance,
-    'langcode' => $langcode,
-  );
-  drupal_alter('pipedrive_field_insert', $items, $context);
-  if (module_exists('rules')) {
-    rules_invoke_all('pipedrive_field_sync');
-  }
-  else {
-    module_invoke_all('pipedrive_field_sync');
-  }
+  // Update and insert are handled the same way.
+  pipedrive_field_update($entity_type, $entity, $field, $instance, $langcode, $items);
 }
 
 /**
