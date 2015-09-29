@@ -454,6 +454,8 @@ function pipedrive_field_update($entity_type, $entity, $field, $instance, $langc
     // Let other modules act on this event too.
     module_invoke_all('pipedrive_field_sync', $pipedrive_type, $sync_data, $entity_type, $entity, $context);
 
+    pipedrive_prepare_sync_data($sync_data);
+
     // If sync isn't skipped do it now.
     if (empty($sync_data->skip_sync) && !empty($sync_data)) {
       // Clean some data.
@@ -560,4 +562,23 @@ function pipedrive_datatype_map($pipedrive_type = NULL) {
     return NULL;
   }
   return $map;
+}
+
+/**
+ * Normalizes the data built using rules for the sync operation.
+ *
+ * This is primarily to reset nested objects to the id value.
+ *
+ * @param object $pipedrive_data
+ *   The data object to normalize.
+ */
+function pipedrive_prepare_sync_data($pipedrive_data) {
+  foreach ((array) $pipedrive_data as $property => $value) {
+    if (substr($property, -3) == '_id' && is_array($value)) {
+      $pipedrive_data->$property = NULL;
+      if (isset($value['id'])) {
+        $pipedrive_data->$property = $value['id'];
+      }
+    }
+  }
 }

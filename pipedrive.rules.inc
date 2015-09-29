@@ -32,131 +32,6 @@ function pipedrive_rules_event_info() {
 function pipedrive_rules_data_info() {
   // Define the data structure of the currently available pipedrive data types.
   $data_info = array();
-  $data_info['pipedrive_activity'] = array(
-    'label' => t('Pipedrive Activity'),
-    'wrap' => TRUE,
-    'property info' => array(
-      'id' => array(
-        'type' => 'integer',
-        'label' => t('ID'),
-      ),
-      'subject' => array(
-        'type' => 'text',
-        'label' => t('Subject'),
-        'required' => TRUE,
-        'sanitized' => TRUE,
-      ),
-      'done' => array(
-        'type' => 'bool',
-        'label' => t('Done'),
-      ),
-      'type' => array(
-        'type' => 'text',
-        'label' => t('Type'),
-        'required' => TRUE,
-        'sanitized' => TRUE,
-        'options list' => 'pipedrive_activity_type_options',
-      ),
-      'due_date' => array(
-        'type' => 'date',
-        'label' => t('Due date'),
-      ),
-      'duration' => array(
-        'type' => 'duration',
-        'label' => t('Duration'),
-      ),
-      'user_id' => array(
-        'type' => 'pipedrive_user',
-        'label' => t('User'),
-      ),
-      'deal_id' => array(
-        'type' => 'pipedrive_deal',
-        'label' => t('Deal'),
-      ),
-      'person_id' => array(
-        'type' => 'pipedrive_person',
-        'label' => t('Person'),
-      ),
-      'org_id' => array(
-        'type' => 'pipedrive_organization',
-        'label' => t('Organization'),
-      ),
-      'note' => array(
-        'type' => 'text',
-        'label' => t('Note'),
-      ),
-      'skip_sync' => array(
-        'type' => 'bool',
-        'label' => t('Skip syncing process to pipedrive'),
-      ),
-    ),
-  );
-
-  // @TODO Add support for DealFields.
-  $data_info['pipedrive_deal'] = array(
-    'label' => t('Pipedrive Deal'),
-    'wrap' => TRUE,
-    'property info' => array(
-      'id' => array(
-        'type' => 'integer',
-        'label' => t('ID'),
-      ),
-      'title' => array(
-        'type' => 'text',
-        'label' => t('Title'),
-        'required' => TRUE,
-        'sanitized' => TRUE,
-      ),
-      'value' => array(
-        'type' => 'decimal',
-        'label' => t('Value'),
-      ),
-      'currency' => array(
-        'type' => 'text',
-        'label' => t('Currency'),
-      ),
-      'status' => array(
-        'type' => 'duration',
-        'label' => t('Duration'),
-        'options list' => 'pipedrive_deal_status_options',
-      ),
-      'lost_reason' => array(
-        'type' => 'text',
-        'label' => t('Lost Reasion'),
-      ),
-      'add_time' => array(
-        'type' => 'date',
-        'label' => t('Add time'),
-      ),
-      'visible_to' => array(
-        'type' => 'integer',
-        'label' => t('Visbile to'),
-        'options list' => 'pipedrive_visibility_options',
-      ),
-      'user_id' => array(
-        'type' => 'pipedrive_user',
-        'label' => t('User'),
-      ),
-      'stage_id' => array(
-        'type' => 'pipedrive_stage',
-        'label' => t('Stage'),
-      ),
-      'person_id' => array(
-        'type' => 'pipedrive_person',
-        'label' => t('Person'),
-      ),
-      'org_id' => array(
-        'type' => 'pipedrive_organization',
-        'label' => t('Organization'),
-      ),
-      'skip_sync' => array(
-        'type' => 'bool',
-        'label' => t('Skip syncing process to pipedrive'),
-      ),
-    ),
-  );
-  pipedrive_rules_data_info_dynamic_fields('deal', $data_info['pipedrive_deal']);
-
   // @TODO Add support for OrganizationFields.
   $data_info['pipedrive_organization'] = array(
     'label' => t('Pipedrive Organization'),
@@ -211,6 +86,8 @@ function pipedrive_rules_data_info() {
       'org_id' => array(
         'type' => 'pipedrive_organization',
         'label' => t('Organization'),
+        'property info' => &$data_info['pipedrive_organization']['property info'],
+        'auto creation' => 'entity_property_create_array',
       ),
       'email' => array(
         'type' => 'text',
@@ -236,6 +113,141 @@ function pipedrive_rules_data_info() {
     ),
   );
   pipedrive_rules_data_info_dynamic_fields('person', $data_info['pipedrive_person']);
+
+  // @TODO Add support for DealFields.
+  $data_info['pipedrive_deal'] = array(
+    'label' => t('Pipedrive Deal'),
+    'wrap' => TRUE,
+    'property info' => array(
+      'id' => array(
+        'type' => 'integer',
+        'label' => t('ID'),
+      ),
+      'title' => array(
+        'type' => 'text',
+        'label' => t('Title'),
+        'required' => TRUE,
+        'sanitized' => TRUE,
+      ),
+      'value' => array(
+        'type' => 'decimal',
+        'label' => t('Value'),
+      ),
+      'currency' => array(
+        'type' => 'text',
+        'label' => t('Currency'),
+      ),
+      'status' => array(
+        'type' => 'duration',
+        'label' => t('Duration'),
+        'options list' => 'pipedrive_deal_status_options',
+      ),
+      'lost_reason' => array(
+        'type' => 'text',
+        'label' => t('Lost Reasion'),
+      ),
+      'add_time' => array(
+        'type' => 'date',
+        'label' => t('Add time'),
+      ),
+      'visible_to' => array(
+        'type' => 'integer',
+        'label' => t('Visbile to'),
+        'options list' => 'pipedrive_visibility_options',
+      ),
+      'user_id' => array(
+        'type' => 'pipedrive_user',
+        'label' => t('User'),
+      ),
+      'stage_id' => array(
+        'type' => 'pipedrive_stage',
+        'label' => t('Stage'),
+      ),
+      'person_id' => array(
+        'type' => 'pipedrive_person',
+        'label' => t('Person'),
+        'property info' => &$data_info['pipedrive_person']['property info'],
+        'auto creation' => 'entity_property_create_array',
+      ),
+      'org_id' => array(
+        'type' => 'pipedrive_organization',
+        'label' => t('Organization'),
+        'property info' => &$data_info['pipedrive_organization']['property info'],
+        'auto creation' => 'entity_property_create_array',
+      ),
+      'skip_sync' => array(
+        'type' => 'bool',
+        'label' => t('Skip syncing process to pipedrive'),
+      ),
+    ),
+  );
+  pipedrive_rules_data_info_dynamic_fields('deal', $data_info['pipedrive_deal']);
+
+  $data_info['pipedrive_activity'] = array(
+    'label' => t('Pipedrive Activity'),
+    'wrap' => TRUE,
+    'property info' => array(
+      'id' => array(
+        'type' => 'integer',
+        'label' => t('ID'),
+      ),
+      'subject' => array(
+        'type' => 'text',
+        'label' => t('Subject'),
+        'required' => TRUE,
+        'sanitized' => TRUE,
+      ),
+      'done' => array(
+        'type' => 'bool',
+        'label' => t('Done'),
+      ),
+      'type' => array(
+        'type' => 'text',
+        'label' => t('Type'),
+        'required' => TRUE,
+        'sanitized' => TRUE,
+        'options list' => 'pipedrive_activity_type_options',
+      ),
+      'due_date' => array(
+        'type' => 'date',
+        'label' => t('Due date'),
+      ),
+      'duration' => array(
+        'type' => 'duration',
+        'label' => t('Duration'),
+      ),
+      'user_id' => array(
+        'type' => 'pipedrive_user',
+        'label' => t('User'),
+      ),
+      'deal_id' => array(
+        'type' => 'pipedrive_deal',
+        'label' => t('Deal'),
+        'property info' => &$data_info['pipedrive_deal']['property info'],
+        'auto creation' => 'entity_property_create_array',
+      ),
+      'person_id' => array(
+        'type' => 'pipedrive_person',
+        'label' => t('Person'),
+        'property info' => &$data_info['pipedrive_person']['property info'],
+        'auto creation' => 'entity_property_create_array',
+      ),
+      'org_id' => array(
+        'type' => 'pipedrive_organization',
+        'label' => t('Organization'),
+        'property info' => &$data_info['pipedrive_organization']['property info'],
+        'auto creation' => 'entity_property_create_array',
+      ),
+      'note' => array(
+        'type' => 'text',
+        'label' => t('Note'),
+      ),
+      'skip_sync' => array(
+        'type' => 'bool',
+        'label' => t('Skip syncing process to pipedrive'),
+      ),
+    ),
+  );
 
   // Set the property getter / setter.
   foreach ($data_info as $type => &$info) {
@@ -310,6 +322,25 @@ function pipedrive_rules_action_info() {
         'pipedrive_fetched' => array('type' => 'unknown', 'label' => t('Fetched pipedrive data')),
       ),
     ),
+    'pipedrive_save' => array(
+      'label' => t('Save pipedrive data'),
+      'parameter' => array(
+        'data' => array(
+          'type' => array(
+            'pipedrive_organization',
+            'pipedrive_person',
+            'pipedrive_deal',
+            'pipedrive_activity',
+          ),
+          'label' => t('Pipedrive data'),
+          'description' => t('Specifies the pipedrive data, which should be synced.'),
+          'restriction' => 'selector',
+          'wrapped' => TRUE,
+        ),
+      ),
+      'group' => t('Pipedrive'),
+      'base' => 'pipedrive_rules_action_pipedriv_save',
+    ),
   );
 }
 
@@ -323,12 +354,47 @@ function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesA
 /**
  * Fetches data from pipedrive.
  */
-function pipedrive_rules_action_pipedriv_fetch($type, $id) {
-  // Load library and use it to fetch the data.
-  $pipedrive = pipedrive_load_library();
-  $data = $pipedrive->{$type}()->getById($id);
-  if (!empty($data['success'])) {
-    return array('pipedrive_fetched' => (object) $data['data']);
+function pipedrive_rules_action_pipedriv_fetch($type, $id, $settings, $state, $element) {
+  try {
+    // Load library and use it to fetch the data.
+    $pipedrive = pipedrive_load_library();
+    $data = $pipedrive->{$type}()->getById($id);
+    if (!empty($data['success'])) {
+      return array('pipedrive_fetched' => (object) $data['data']);
+    }
+    return array('pipedrive_fetched' => NULL);
   }
-  return array('pipedrive_fetched' => NULL);
+  catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
+    throw new RulesEvaluationException($e->getMessage(), array(), $element);
+  }
+}
+
+/**
+ * Sync pipedrive data.
+ *
+ * @param EntityStructureWrapper $wrapper
+ *   The wrapped pipedrive data.
+ */
+function pipedrive_rules_action_pipedriv_save($wrapper, $settings, $state, $element) {
+  try {
+    // Load library and use it to save the sync data.
+    $pipedrive = pipedrive_load_library();
+    $types = pipedrive_data_types();
+    $type = str_replace('pipedrive_', '', $wrapper->type());
+    if (isset($types[$type])) {
+      $sync_data = $wrapper->value();
+      pipedrive_prepare_sync_data($sync_data);
+      if (!empty($sync_data->id)) {
+        $synced = $pipedrive->{$types[$type]}()
+          ->update($sync_data->id, (array) $sync_data);
+      }
+      else {
+        $synced = $pipedrive->{$types[$type]}()
+          ->add((array) $sync_data);
+      }
+    }
+  }
+  catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
+    throw new RulesEvaluationException($e->getMessage(), array(), $element);
+  }
 }
