@@ -582,3 +582,23 @@ function pipedrive_prepare_sync_data($pipedrive_data) {
     }
   }
 }
+
+/**
+ * Normalizes fetched data to be ready for rules.
+ *
+ * Strangely we need to rename some fetched stuff to make it compatible with the
+ * POST structure.
+ * - org_id: value -> id.
+ *
+ * @param object $pipedrive_data
+ *   The data object to normalize.
+ */
+function pipedrive_prepare_fetched_data($pipedrive_data) {
+  foreach ((array) $pipedrive_data as $property => $value) {
+    switch ($property) {
+      case 'org_id':
+        $pipedrive_data->{$property}['id'] = $value['value'];
+        break;
+    }
+  }
+}

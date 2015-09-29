@@ -360,7 +360,10 @@ function pipedrive_rules_action_pipedriv_fetch($type, $id, $settings, $state, $e
     $pipedrive = pipedrive_load_library();
     $data = $pipedrive->{$type}()->getById($id);
     if (!empty($data['success'])) {
-      return array('pipedrive_fetched' => (object) $data['data']);
+      $object_data = (object) $data['data'];
+      pipedrive_prepare_fetched_data($object_data);
+
+      return array('pipedrive_fetched' => $object_data);
     }
     return array('pipedrive_fetched' => NULL);
   }
