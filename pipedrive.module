@@ -207,7 +207,81 @@ function pipedrive_field_info() {
       'instance_settings' => array(
         'sync_delete' => TRUE,
       ),
+      'property_type' => 'pipedrive',
+      'property_callbacks' => array('pipedrive_property_info_callback'),
     ),
+  );
+}
+
+/**
+ * Callback to alter the property info of address fields.
+ *
+ * @see pipedrive_field_info().
+ */
+function pipedrive_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $name = $field['field_name'];
+  $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$name];
+
+  $property['type'] = ($field['cardinality'] != 1) ? 'list<pipedrive>' : 'pipedrive';
+  $property['getter callback'] = 'entity_metadata_field_verbatim_get';
+  $property['setter callback'] = 'entity_metadata_field_verbatim_set';
+  $property['property info'] = pipedrive_data_property_info();
+
+  unset($property['query callback']);
+}
+
+/**
+ * Auto creation callback for an pipedrive value array.
+ *
+ * @see pipedrive_property_info_callback()
+ */
+function pipedrive_auto_creation($property_name, $context) {
+  return pipedrive_default_values($context['field'], $context['instance']);
+}
+
+/**
+ * Defines info for the properties of the address field data structure.
+ */
+function pipedrive_data_property_info($name = NULL) {
+  // Build an array of basic property information for the address field.
+  $properties = array(
+    'id' => array(
+      'label' => t('ID'),
+      'type' => 'integer',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+    'last_sync' => array(
+      'label' => t('Last sync'),
+      'type' => 'date',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+    'status' => array(
+      'label' => t('Status'),
+      'type' => 'integer',
+      'options list' => 'pipedrive_field_status_options',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+    'data' => array(
+      'label' => t('Data'),
+      'type' => 'struct',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
+  );
+
+  return $properties;
+}
+
+/**
+ * Options for the status property of the pipedrive field.
+ */
+function pipedrive_field_status_options() {
+  return array(
+    0 => t('Error'),
+    1 => t('Success'),
   );
 }
 
