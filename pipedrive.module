@@ -461,13 +461,20 @@ function pipedrive_field_update($entity_type, $entity, $field, $instance, $langc
       // Clean some data.
       unset($sync_data->skip_sync);
 
-      // Load library and use it to save the sync data.
-      $pipedrive = pipedrive_load_library();
-      if (!empty($sync_data->id)) {
-        $synced = $pipedrive->{$field['settings']['pipedrive_type']}()->update($sync_data->id, (array) $sync_data);
+      try {
+        // Load library and use it to save the sync data.
+        $pipedrive = pipedrive_load_library();
+        if (!empty($sync_data->id)) {
+          $synced = $pipedrive->{$field['settings']['pipedrive_type']}()
+            ->update($sync_data->id, (array) $sync_data);
+        }
+        else {
+          $synced = $pipedrive->{$field['settings']['pipedrive_type']}()
+            ->add((array) $sync_data);
+        }
       }
-      else {
-        $synced = $pipedrive->{$field['settings']['pipedrive_type']}()->add((array) $sync_data);
+      catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
+        watchdog_exception('Pipedrive', $e);
       }
 
       // Process the response and set the field values accordingly.
@@ -487,8 +494,13 @@ function pipedrive_field_update($entity_type, $entity, $field, $instance, $langc
 function pipedrive_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
   // If deletion sync is enabled and there's a remote id - delete.
   if (!empty($instance['settings']['sync_delete']) && !empty($items[0]['id'])) {
-    $pipedrive = pipedrive_load_library();
-    $pipedrive->{$field['settings']['pipedrive_type']}()->delete($items[0]['id']);
+    try {
+      $pipedrive = pipedrive_load_library();
+      $pipedrive->{$field['settings']['pipedrive_type']}()->delete($items[0]['id']);
+    }
+    catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
+      watchdog_exception('Pipedrive', $e);
+    }
   }
 }
 
@@ -512,15 +524,20 @@ function pipedrive_get_dynamic_fields($type, $reset = FALSE) {
     $fields = $cache->data;
   }
   if (empty($fields[$type]) || $reset) {
-    $pipedrive = pipedrive_load_library();
-    $fields[$type] = array();
-    $method = $type . 'Fields';
-    if (method_exists($pipedrive, $method)) {
-      $response = $pipedrive->$method()->getAll();
-      if (!empty($response['success'])) {
-        $fields[$type] = $response['data'];
-        cache_set('pipdrive:dynamic_fields', $fields);
+    try {
+      $pipedrive = pipedrive_load_library();
+      $fields[$type] = array();
+      $method = $type . 'Fields';
+      if (method_exists($pipedrive, $method)) {
+        $response = $pipedrive->$method()->getAll();
+        if (!empty($response['success'])) {
+          $fields[$type] = $response['data'];
+          cache_set('pipdrive:dynamic_fields', $fields);
+        }
       }
+    }
+    catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
+      watchdog_exception('Pipedrive', $e);
     }
   }
   return $fields[$type];
