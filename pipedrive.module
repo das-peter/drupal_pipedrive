@@ -264,6 +264,12 @@ function pipedrive_data_property_info($name = NULL) {
       'getter callback' => 'entity_property_verbatim_get',
       'setter callback' => 'entity_property_verbatim_set',
     ),
+    'skip_sync' => array(
+      'label' => t('Skip Sync'),
+      'type' => 'boolean',
+      'getter callback' => 'entity_property_verbatim_get',
+      'setter callback' => 'entity_property_verbatim_set',
+    ),
     'data' => array(
       'label' => t('Data'),
       'type' => 'struct',
@@ -430,6 +436,11 @@ function pipedrive_field_insert($entity_type, $entity, $field, $instance, $langc
  */
 function pipedrive_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
   $data_types = array_flip(pipedrive_data_types());
+  // Check if the field is marked as to skip.
+  // @TODO Keep the processing but skip just sync instead?
+  if (!empty($items[0]['skip_sync'])) {
+    return;
+  }
   if (isset($data_types[$field['settings']['pipedrive_type']])) {
     $pipedrive_type = $data_types[$field['settings']['pipedrive_type']];
     $context = array(
