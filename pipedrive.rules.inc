@@ -348,7 +348,9 @@ function pipedrive_rules_action_info() {
  * Info alteration callback for the entity fetch action.
  */
 function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
-  $element_info['provides']['pipedrive_fetched']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
+  if (isset($element->settings['type'])) {
+    $element_info['provides']['pipedrive_fetched']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
+  }
 }
 
 /**
