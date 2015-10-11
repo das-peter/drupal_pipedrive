@@ -317,7 +317,7 @@ function pipedrive_rules_action_info() {
         'id' => array('type' => 'text', 'label' => t('Identifier')),
       ),
       'group' => t('Pipedrive'),
-      'base' => 'pipedrive_rules_action_pipedriv_fetch',
+      'base' => 'pipedrive_rules_action_pipedrive_fetch',
       'provides' => array(
         'pipedrive_fetched' => array('type' => 'unknown', 'label' => t('Fetched pipedrive data')),
       ),
@@ -347,7 +347,7 @@ function pipedrive_rules_action_info() {
 /**
  * Info alteration callback for the entity fetch action.
  */
-function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
+function pipedrive_rules_action_pipedrive_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
   if (isset($element->settings['type'])) {
     $element_info['provides']['pipedrive_fetched']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
   }
@@ -356,7 +356,7 @@ function pipedrive_rules_action_pipedriv_fetch_info_alter(&$element_info, RulesA
 /**
  * Fetches data from pipedrive.
  */
-function pipedrive_rules_action_pipedriv_fetch($type, $id, $settings, $state, $element) {
+function pipedrive_rules_action_pipedrive_fetch($type, $id, $settings, $state, $element) {
   try {
     // Load library and use it to fetch the data.
     $pipedrive = pipedrive_load_library();
