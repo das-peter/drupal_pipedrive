@@ -138,8 +138,8 @@ function pipedrive_rules_data_info() {
         'label' => t('Currency'),
       ),
       'status' => array(
-        'type' => 'duration',
-        'label' => t('Duration'),
+        'type' => 'text',
+        'label' => t('Status'),
         'options list' => 'pipedrive_deal_status_options',
       ),
       'lost_reason' => array(
