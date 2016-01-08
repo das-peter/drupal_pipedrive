@@ -341,15 +341,41 @@ function pipedrive_rules_action_info() {
       'group' => t('Pipedrive'),
       'base' => 'pipedrive_rules_action_pipedriv_save',
     ),
+    'pipedrive_create' => array(
+      'label' => t('Create pipedrive data'),
+      'parameter' => array(
+        'type' => array(
+          'type' => 'text',
+          'label' => t('Pipedrive data type'),
+          'options list' => 'pipedrive_data_type_options',
+          'description' => t('Specifies the type of pipedrive data that should be created.'),
+          'restriction' => 'input',
+        ),
+      ),
+      'base' => 'pipedrive_rules_action_pipedrive_create',
+      'provides' => array(
+        'pipedrive_data' => array('type' => 'unknown', 'label' => t('Pipedrive data')),
+      ),
+      'group' => t('Pipedrive'),
+    ),
   );
 }
 
 /**
- * Info alteration callback for the entity fetch action.
+ * Info alteration callback for the pipedrive fetch action.
  */
 function pipedrive_rules_action_pipedrive_fetch_info_alter(&$element_info, RulesAbstractPlugin $element) {
   if (isset($element->settings['type'])) {
     $element_info['provides']['pipedrive_fetched']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
+  }
+}
+
+/**
+ * Info alteration callback for the data create action.
+ */
+function pipedrive_rules_action_pipedrive_create_info_alter(&$element_info, RulesAbstractPlugin $element) {
+  if (isset($element->settings['type'])) {
+    $element_info['provides']['pipedrive_data']['type'] = 'pipedrive_' . array_search($element->settings['type'], pipedrive_data_types());
   }
 }
 
@@ -372,6 +398,13 @@ function pipedrive_rules_action_pipedrive_fetch($type, $id, $settings, $state, $
   catch (\Benhawker\Pipedrive\Exceptions\PipedriveException $e) {
     throw new RulesEvaluationException($e->getMessage(), array(), $element);
   }
+}
+
+/**
+ * Create raw pipedrive data.
+ */
+function pipedrive_rules_action_pipedrive_create() {
+  return array('pipedrive_data' => new stdClass());
 }
 
 /**
